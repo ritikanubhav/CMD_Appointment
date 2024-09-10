@@ -10,6 +10,8 @@ namespace CMD.Appointment.Data
 {
     public class AppointmentRepo : IAppointmentRepo
     {
+        private readonly AppointmentDbContext db;
+        public AppointmentRepo(AppointmentDbContext db) { this.db = db; }
         public Task AddAppointment(AppointmentModel appointmentModel)
         {
             throw new NotImplementedException();
