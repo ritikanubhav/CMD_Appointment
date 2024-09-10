@@ -22,6 +22,7 @@ namespace CMD.Appointment.Data
 
         public Task<AppointmentModel> GetAppointmentById(int id)
         {
+            //only for the appointment ID
             throw new NotImplementedException();
         }
 
@@ -31,6 +32,26 @@ namespace CMD.Appointment.Data
         }
 
         public Task UpdateAppointment(AppointmentModel appointmentModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<AppointmentModel>> FilterAppointmentsByDate(DateTime date)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<AppointmentModel>> FilterAppointmentsByStatus(string status)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<AppointmentModel>> GetActiveAppointments()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<AppointmentModel>> GetInactiveAppointments()
         {
             throw new NotImplementedException();
         }
