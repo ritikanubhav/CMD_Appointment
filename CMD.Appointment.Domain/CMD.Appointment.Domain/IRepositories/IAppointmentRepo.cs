@@ -10,15 +10,11 @@ namespace CMD.Appointment.Domain.IRepositories
     public interface IAppointmentRepo
     {
         public Task AddAppointment(AppointmentModel appointmentModel);
-
         public Task UpdateAppointment(AppointmentModel  appointmentModel);
-
         public Task<AppointmentModel> GetAppointmentById(int id);
-
-        public Task<List<AppointmentModel>> GetAllAppointments();
-        public Task RemoveAppointment(int id);
-        public Task<List<AppointmentModel>> GetActiveAppointments();
-        public Task<List<AppointmentModel>> GetInactiveAppointments();
+        public Task<List<AppointmentModel>> GetAllAppointments(int pageNumber , int pageSize);
+        public Task<List<AppointmentModel>> GetActiveAppointments(int pageNumber, int pageSize);
+        public Task<List<AppointmentModel>> GetInactiveAppointments(int pageNumber, int pageSize);
         public Task<List<AppointmentModel>> FilterAppointmentsByDate(DateOnly date);
         public Task<List<AppointmentModel>> FilterAppointmentsByStatus(string status);
         public Task CancelAppointment(int id);

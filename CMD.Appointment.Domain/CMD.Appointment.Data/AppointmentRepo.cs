@@ -17,28 +17,39 @@ namespace CMD.Appointment.Data
         public async Task AddAppointment(AppointmentModel appointmentModel)
         {
             await db.Appointments.AddAsync(appointmentModel);
-            db.SaveChangesAsync();
+            await db.SaveChangesAsync();
         }
 
-        public Task<List<AppointmentModel>> GetAllAppointments()
+        public async Task<List<AppointmentModel>> GetAllAppointments(int pageNumber = 1, int pageSize = 10)
         {
-            throw new NotImplementedException();
+            var pagedAppointments = await db.Appointments
+                                    .Skip((pageNumber - 1) * pageSize) // Skips the records for previous pages
+                                    .Take(pageSize) // Takes the records for the current page
+                                    .ToListAsync();
+            return pagedAppointments;
         }
 
-        public Task<AppointmentModel> GetAppointmentById(int id)
+        public async Task<AppointmentModel> GetAppointmentById(int id)
         {
-            //only for the appointment ID
-            throw new NotImplementedException();
+            var appointment= await db.Appointments.FindAsync(id);
+            if (appointment != null)
+                return appointment;
+            else
+                throw new Exception("No Appointment Found for this Id");
         }
 
-        public Task RemoveAppointment(int id)
+        public async Task UpdateAppointment(AppointmentModel appointmentModel)
         {
-            throw new NotImplementedException();
+            db.Appointments.Update(appointmentModel);
+            await db.SaveChangesAsync();
         }
-
-        public Task UpdateAppointment(AppointmentModel appointmentModel)
+        public async Task<List<AppointmentModel>> GetActiveAppointments(int pageNumber = 1, int pageSize = 10)
         {
-            throw new NotImplementedException();
+             var pagedAppointments = await db.Appointments.Where(a => a.Status == AppointmentStatus.SCHEDULED)
+                                    .Skip((pageNumber - 1) * pageSize) // Skips the records for previous pages
+                                    .Take(pageSize) // Takes the records for the current page
+                                    .ToListAsync();
+            return pagedAppointments;
         }
 
         public async Task<List<AppointmentModel>> FilterAppointmentsByDate(DateOnly date)
@@ -52,14 +63,14 @@ namespace CMD.Appointment.Data
             return await db.Appointments.Where(a=>a.Status.ToString()==status).ToListAsync();
         }
 
-        public Task<List<AppointmentModel>> GetActiveAppointments()
-        {
-            throw new NotImplementedException();
-        }
 
-        public async Task<List<AppointmentModel>> GetInactiveAppointments()
+        public async Task<List<AppointmentModel>> GetInactiveAppointments(int pageNumber = 1, int pageSize = 10)
         {
-            return await db.Appointments.Where(a=>a.Status==AppointmentStatus.CANCELLED ||a.Status==AppointmentStatus.CLOSED).ToListAsync();
+            var pagedAppointments = await db.Appointments.Where(a => a.Status == AppointmentStatus.CANCELLED||a.Status==AppointmentStatus.CLOSED)
+                                    .Skip((pageNumber - 1) * pageSize) // Skips the records for previous pages
+                                    .Take(pageSize) // Takes the records for the current page
+                                    .ToListAsync();
+            return pagedAppointments;
         }
 
         public async Task CancelAppointment(int id)

@@ -1,4 +1,5 @@
-﻿using CMD.Appointment.Domain.IRepositories;
+﻿using CMD.Appointment.Domain.Entities;
+using CMD.Appointment.Domain.IRepositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,72 +7,124 @@ namespace CMD.Appointment.ApiService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AppointmentController : ControllerBase
+    public class AppointmentsController : ControllerBase
     {
         private readonly IAppointmentRepo appointmentRepo;
 
-        public AppointmentController(IAppointmentRepo appointmentRepo)
+        public AppointmentsController(IAppointmentRepo appointmentRepo)
         {
             this.appointmentRepo = appointmentRepo;
         }
 
-
-        [Route("api/[controller]")]
-        [ApiController]
-        public class AppointmentsController : ControllerBase
+        // POST: api/Appointments
+        [HttpPost]
+        public async Task<IActionResult> AddAppointment(AppointmentModel appointment)
         {
-            private readonly IAppointmentRepo _appointmentRepo;
-
-            public AppointmentsController(IAppointmentRepo appointmentRepo)
+            try
             {
-                _appointmentRepo = appointmentRepo;
+                await appointmentRepo.AddAppointment(appointment);
+                return Created();
             }
-
-            // GET: api/Appointments/FilterByDate
-            [HttpGet("FilterByDate")]
-            public async Task<IActionResult> FilterAppointmentsByDate(DateTime date)
+            catch (Exception ex)
             {
-                var result = await _appointmentRepo.FilterAppointmentsByDate(DateOnly.FromDateTime(date));
-
-                if (result == null || result.Count == 0)
-                    return NotFound("No appointments found for the specified date.");
-
-                return Ok(result);
+                return BadRequest(ex.Message);
             }
+        }
 
-            // GET: api/Appointments/FilterByStatus
-            [HttpGet("FilterByStatus")]
-            public async Task<IActionResult> FilterAppointmentsByStatus(string status)
+        //Put : api/appointments
+        [HttpPut]
+        public async Task<IActionResult> UpdateAppointment(AppointmentModel appointment)
+        {
+            try
             {
-                var result = await _appointmentRepo.FilterAppointmentsByStatus(status);
-
-                if (result == null || result.Count == 0)
-                    return NotFound($"No appointments found with status: {status}");
-
-                return Ok(result);
+                await appointmentRepo.UpdateAppointment(appointment);
+                return Ok(appointment);
             }
-
-            // GET: api/Appointments/Inactive
-            [HttpGet("Inactive")]
-            public async Task<IActionResult> GetInactiveAppointments()
+            catch (Exception ex)
             {
-                var result = await _appointmentRepo.GetInactiveAppointments();
-
-                if (result == null || result.Count == 0)
-                    return NotFound("No inactive appointments found.");
-
-                return Ok(result);
+                return BadRequest(ex.Message);
             }
-
-            // PUT: api/Appointments/Cancel/{id}
-            [HttpPut("Cancel/{id}")]
-            public async Task<IActionResult> CancelAppointment(int id)
+        }
+        //GET : api/appintments/1
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IActionResult> GetAppointmentById(int id)
+        {
+            try
             {
-                await _appointmentRepo.CancelAppointment(id);
-                return Ok("Appointment cancelled successfully.");
+                var appointment=await appointmentRepo.GetAppointmentById(id);
+                return Ok(appointment);
             }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
+        //GET : api/appintments?pageNo=1?pageLimit=10
+        [HttpGet]
+        public async Task<IActionResult> GetAllAppointments([FromQuery] int pageNo, [FromQuery] int pageLimit)
+        {
+            var allAppointments= await appointmentRepo.GetAllAppointments(pageNo, pageLimit);
+            if(allAppointments==null||allAppointments.Count()==0)
+                return NotFound("No appointments found.");
+            return Ok(allAppointments);
+        }
 
+        // GET: api/Appointments/active
+        [HttpGet("active")]
+        public async Task<IActionResult> GetActiveAppointments([FromQuery] int pageNo, [FromQuery] int pageLimit)
+        {
+            var result = await appointmentRepo.GetActiveAppointments(pageNo, pageLimit);
+
+            if (result == null || result.Count == 0)
+                return NotFound("No Active appointments found.");
+
+            return Ok(result);
+        }
+
+        // GET: api/Appointments/Inactive
+        [HttpGet("Inactive")]
+        public async Task<IActionResult> GetInactiveAppointments([FromQuery] int pageNo, [FromQuery] int pageLimit)
+        {
+            var result = await appointmentRepo.GetInactiveAppointments(pageNo, pageLimit);
+
+            if (result == null || result.Count == 0)
+                return NotFound("No inactive appointments found.");
+
+            return Ok(result);
+        }
+
+        // GET: api/Appointments/FilterByDate
+        [HttpGet("FilterByDate")]
+        public async Task<IActionResult> FilterAppointmentsByDate(DateTime date)
+        {
+            var result = await appointmentRepo.FilterAppointmentsByDate(DateOnly.FromDateTime(date));
+
+            if (result == null || result.Count == 0)
+                return NotFound("No appointments found for the specified date.");
+
+            return Ok(result);
+        }
+
+        // GET: api/Appointments/FilterByStatus
+        [HttpGet("FilterByStatus")]
+        public async Task<IActionResult> FilterAppointmentsByStatus(string status)
+        {
+            var result = await appointmentRepo.FilterAppointmentsByStatus(status);
+
+            if (result == null || result.Count == 0)
+                return NotFound($"No appointments found with status: {status}");
+
+            return Ok(result);
+        }
+
+        // PUT: api/Appointments/Cancel/{id}
+        [HttpPut("Cancel/{id}")]
+        public async Task<IActionResult> CancelAppointment(int id)
+        {
+            await appointmentRepo.CancelAppointment(id);
+            return Ok("Appointment cancelled successfully.");
         }
     }
 }
