@@ -17,5 +17,10 @@ namespace CMD.Appointment.Domain.IRepositories
 
         public Task<List<AppointmentModel>> GetAllAppointments();
         public Task RemoveAppointment(int id);
+        public Task<List<AppointmentModel>> GetActiveAppointments();
+        public Task<List<AppointmentModel>> GetInactiveAppointments();
+        public Task<List<AppointmentModel>> FilterAppointmentsByDate(DateOnly date);
+        public Task<List<AppointmentModel>> FilterAppointmentsByStatus(string status);
+        public Task CancelAppointment(int id);
     }
 }
