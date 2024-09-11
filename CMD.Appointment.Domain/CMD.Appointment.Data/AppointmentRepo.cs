@@ -12,9 +12,10 @@ namespace CMD.Appointment.Data
     {
         private readonly AppointmentDbContext db;
         public AppointmentRepo(AppointmentDbContext db) { this.db = db; }
-        public Task AddAppointment(AppointmentModel appointmentModel)
+        public async Task AddAppointment(AppointmentModel appointmentModel)
         {
-            throw new NotImplementedException();
+            await db.Appointments.AddAsync(appointmentModel);
+            db.SaveChangesAsync();
         }
 
         public Task<List<AppointmentModel>> GetAllAppointments()
